@@ -13,6 +13,7 @@
 <context:property-placeholder location="classpath:WCBasics.properties"/>
 
 <bean id="webcrawlerimplementation" class="${webCrawler.implementation.fullClasspath}">
+	<property name="downloadDir" value="${WebCrawler.downloads.baseDirectory}"/>
 </bean>
 <bean id="urlcrawler" class="pramati.crawler.processor.UrlCrawler">
 </bean>

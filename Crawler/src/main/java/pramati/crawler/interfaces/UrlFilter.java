@@ -6,5 +6,5 @@ import java.util.Set;
 
 public interface UrlFilter {
 	Set<URL> filter(List<URL> hyperlynkUrl);
-	boolean isfinal(URL url);
+	boolean isfinal(URL url) throws Exception;
 }

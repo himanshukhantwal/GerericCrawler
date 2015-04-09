@@ -57,7 +57,7 @@ public class WCFileHandler {
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
-			//log.error("error occured while creating: file {"+recFileName+"} in dir {"+dirForRecFile+"}",e);
+			e.printStackTrace();
 		}
 		
 	}

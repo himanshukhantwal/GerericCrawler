@@ -28,7 +28,7 @@ public class MailCrawlerStartup implements WebCrawlerImp,ApplicationContextAware
 		System.out.println("starting crawler....");
 		this.validateInput(input);
 		UrlCrawler urlCrawler=(UrlCrawler) context.getBean("urlcrawler");
-		urlCrawler.startUrlCrawling(this.url,URL_FILTER_FOR_MAIL,FILE_DOWNLOAD_HELPER_FOR_MAIL);
+		urlCrawler.startUrlCrawling(this.url,URL_FILTER_FOR_MAIL,FILE_DOWNLOAD_HELPER_FOR_MAIL,downloadDir);
 	}
 	
 	private void validateInput(String[] input) throws MalformedURLException {

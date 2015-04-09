@@ -16,5 +16,6 @@
 	<property name="downloadDir" value="${WebCrawler.downloads.baseDirectory}"/>
 </bean>
 <bean id="urlcrawler" class="pramati.crawler.processor.UrlCrawler">
+	<property name="noOfThreads" value="${WebCrawler.threads.downloader.noOfThreads}"/>
 </bean>
 </beans>

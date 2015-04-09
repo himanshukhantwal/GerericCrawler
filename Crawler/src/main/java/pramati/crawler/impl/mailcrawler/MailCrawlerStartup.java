@@ -12,12 +12,11 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import pramati.crawler.interfaces.DownloaderHelper;
 import pramati.crawler.interfaces.UrlFilter;
 import pramati.crawler.interfaces.WebCrawlerImp;
-import pramati.crawler.intf.DownloaderHelper;
 import pramati.crawler.processor.UrlCrawler;
 import pramati.crawler.utils.URLHelper;
-import pramati.crawler.utils.WCFileHandler;
 
 public class MailCrawlerStartup implements WebCrawlerImp,ApplicationContextAware{
 	private ApplicationContext context;
@@ -57,7 +56,7 @@ public class MailCrawlerStartup implements WebCrawlerImp,ApplicationContextAware
 	public void setDownloadDir(String downloadDir) {
 		this.downloadDir = downloadDir;
 	}
-	private static final UrlFilter URL_FILTER_FOR_MAIL =new UrlFilter(){
+	protected static final UrlFilter URL_FILTER_FOR_MAIL =new UrlFilter(){
 
 		public Set<URL> filter(List<URL> urlList) {
 			Set<URL> filteredUrlSet=new HashSet<URL>();
@@ -85,7 +84,7 @@ public class MailCrawlerStartup implements WebCrawlerImp,ApplicationContextAware
 		}
 	};
 	
-	private static final DownloaderHelper FILE_DOWNLOAD_HELPER_FOR_MAIL=new DownloaderHelper() {
+	protected static final DownloaderHelper FILE_DOWNLOAD_HELPER_FOR_MAIL=new DownloaderHelper() {
 		
 		public String getFileNameFrmUrlCntnt(String fileCntnt) {
 				String fileName=null;
@@ -96,23 +95,32 @@ public class MailCrawlerStartup implements WebCrawlerImp,ApplicationContextAware
 				String frmStr=getStrPartBasedOnstr(fileCntnt, "From");
 				String dateStr=getStrPartBasedOnstr(fileCntnt,"Date");
 				
-				fileName=frmStr+"+"+subjectStr+"+"+dateStr;
+				fileName=frmStr+" + "+subjectStr+" + "+dateStr;
 				return fileName;
 		}
 		
 		public String getDirOfFileFrmUrlCntnt(String fileCntnt) {
-			String dir="";
-			String dateStr=getStrPartBasedOnstr(fileCntnt,"Date");
-			String[] token=dateStr.split(" ");
-				if(token.length>3){
-					dir=downloadDir+"/YEAR_"+token[3].trim()+"/"+"MONTH_"+token[2].trim();
-				}
+			String dir = "";
+			String dateStr = getStrPartBasedOnstr(fileCntnt, "Date");
+			String[] token = dateStr.split(" ");
+			int replaceInd = 0;
+			for (int i = 0; i < token.length; i++) {
+				if (!token[i].equals(""))
+					token[replaceInd++] = token[i];
+			}
+			if (token[3].length()==4) {
+				token[3] = (token[3].trim()).substring(2);
+			}
+			if (token.length > 3) {
+				dir = downloadDir + "/YEAR_" + token[3] + "/" + "MONTH_"
+						+ token[2].trim();
+			}
 			return dir;
 		}
 
 		private String getStrPartBasedOnstr(String fileCntnt, String matchStr) {
 			String dateStr="";
-			Pattern pattern=Pattern.compile("\\s*"+matchStr+":\\s*(.*?)(?m)$");
+			Pattern pattern=Pattern.compile("\\s*"+matchStr+": \\s*(.*?)(?m)$");
 			Matcher matcher=pattern.matcher(fileCntnt);
 			if(matcher.find()){
 				dateStr=matcher.group(1);

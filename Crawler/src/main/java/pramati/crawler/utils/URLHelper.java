@@ -6,6 +6,8 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
 
+import org.apache.log4j.Logger;
+
 /**
  * singleton class
  * 
@@ -14,6 +16,7 @@ import java.net.URL;
  *
  */
 public class URLHelper {
+	private final Logger log=Logger.getLogger(URLHelper.class);
 	private static URLHelper instance; 
 	private URLHelper(){}
 	
@@ -33,7 +36,7 @@ public class URLHelper {
 		try {
 			reader=new BufferedInputStream(url.openStream());
 		} catch (IOException e) {
-			throw new Exception("PROBLEM_IN_URL_READING",e);
+			log.error("PROBLEM_IN_URL_READING"+url.toString());
 		}
 		
 		Writer writer=new StringWriter();

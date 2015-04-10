@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -19,13 +20,15 @@ import pramati.crawler.processor.UrlCrawler;
 import pramati.crawler.utils.URLHelper;
 
 public class MailCrawlerStartup implements WebCrawlerImp,ApplicationContextAware{
+	private static final Logger log=Logger.getLogger(MailCrawlerStartup.class);
+	
 	private ApplicationContext context;
 	private URL url;
 	private static String year="";
 	private static String downloadDir;
 	
 	public void startCrawling(String[] input) throws Exception {
-		System.out.println("starting crawler....");
+		log.info("starting crawler....");
 		this.validateInput(input);
 		UrlCrawler urlCrawler=(UrlCrawler) context.getBean("urlcrawler");
 		urlCrawler.startUrlCrawling(this.url,URL_FILTER_FOR_MAIL,FILE_DOWNLOAD_HELPER_FOR_MAIL,downloadDir);
@@ -35,14 +38,14 @@ public class MailCrawlerStartup implements WebCrawlerImp,ApplicationContextAware
 		try {
 			url=new URL(input[0]);
 		} catch (MalformedURLException e) {
-			e.printStackTrace();
+			log.error("URL_NOT_PROPER", e);
 			throw e;
 		}
 		try{
 		Integer.parseInt(input[1]);
 		year=input[1];
 		}catch(NumberFormatException e){
-			e.printStackTrace();
+			year="";
 		}
 	}
 	public void setApplicationContext(ApplicationContext context)
@@ -54,7 +57,7 @@ public class MailCrawlerStartup implements WebCrawlerImp,ApplicationContextAware
 		return downloadDir;
 	}
 	public void setDownloadDir(String downloadDir) {
-		this.downloadDir = downloadDir;
+		MailCrawlerStartup.downloadDir = downloadDir;
 	}
 	protected static final UrlFilter URL_FILTER_FOR_MAIL =new UrlFilter(){
 
@@ -75,12 +78,14 @@ public class MailCrawlerStartup implements WebCrawlerImp,ApplicationContextAware
 		}
 
 		public boolean isfinal(URL url) throws Exception {
-			if(url.toString().contains("raw")
-					&& URLHelper.getInstance().getPageContentInTxtFrmt(url).indexOf("From users-return")==0){				
-				return true;
-			}else{
-				return false;
+			if(url.toString().contains("raw") && !url.toString().contains("${")){
+				Pattern pattern=Pattern.compile("raw/%3c"+"(.*?)"+"%3e"+"(?m)$");
+				Matcher matcher=pattern.matcher(url.toString());
+				if(matcher.find()){
+					return true;
+				}
 			}
+			return false;
 		}
 	};
 	
@@ -108,12 +113,23 @@ public class MailCrawlerStartup implements WebCrawlerImp,ApplicationContextAware
 				if (!token[i].equals(""))
 					token[replaceInd++] = token[i];
 			}
-			if (token[3].length()==4) {
-				token[3] = (token[3].trim()).substring(2);
-			}
-			if (token.length > 3) {
-				dir = downloadDir + "/YEAR_" + token[3] + "/" + "MONTH_"
-						+ token[2].trim();
+
+			if (dateStr.contains(",")) {
+				if (token.length > 3) {
+					if (token[3].length() == 4) {
+						token[3] = (token[3].trim()).substring(2);
+					}
+					dir = downloadDir + "/YEAR_" + token[3] + "/" + "MONTH_"
+							+ token[2].trim();
+				}
+			} else {
+				if (token.length > 3) {
+					if (token[2].length() == 4) {
+						token[2] = (token[2].trim()).substring(2);
+					}
+					dir = downloadDir + "/YEAR_" + token[2] + "/" + "MONTH_"
+							+ token[1].trim();
+				}
 			}
 			return dir;
 		}

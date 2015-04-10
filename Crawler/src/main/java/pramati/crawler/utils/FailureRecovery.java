@@ -5,7 +5,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+
+import pramati.crawler.interfaces.UrlFilter;
 
 public class FailureRecovery {
 	private static FailureRecovery instance;
@@ -19,7 +22,7 @@ public class FailureRecovery {
 	}
 
 
-	public Set<URL> getDwnlodedUrls(String recoveryDir) {
+	public Set<URL> getDwnlodedUrls(String recoveryDir,UrlFilter urlFilter) {
 		File[] fileList=WCFileHandler.getInstance().getFileListFrmDir(recoveryDir);
 		Set<URL> urlSet=new LinkedHashSet<URL>();
 		for(File file:fileList){
@@ -31,6 +34,8 @@ public class FailureRecovery {
 				}
 			}
 		}
-		return urlSet;
+		List<URL> temp=new ArrayList<URL>();
+		temp.addAll(urlSet);
+		return urlFilter.filter(temp);
 	}
 }

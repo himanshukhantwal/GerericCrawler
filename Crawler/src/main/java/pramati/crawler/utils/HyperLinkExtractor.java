@@ -28,7 +28,7 @@ public class HyperLinkExtractor {
 		return getHyperLinksFromXMLContent(URLHelper.getInstance().getPageContentInTxtFrmt(url));
 	}
 
-	private List<String> getHyperLinksFromXMLContent(
+	protected List<String> getHyperLinksFromXMLContent(
 			String pageContentInTxtFrmt) {
 		String regex="\\s*(?i)href\\s*=\\s*(\"([^\"]*\")|'[^']*'|([^'\">\\s]+))";
 		List<String> hyperlynk=new ArrayList<String>();

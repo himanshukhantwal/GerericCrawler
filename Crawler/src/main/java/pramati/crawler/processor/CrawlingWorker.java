@@ -66,7 +66,7 @@ public class CrawlingWorker implements Runnable {
 				Set<URL> filteredUrl = urlFilter.filter(hyperlynkUrl);
 				urlToBeCrawled.addAll(filteredUrl);
 				}catch(Exception e){
-					log.error("Error Reading URL"+url.toString());
+					log.error("Error Reading URL "+url.toString(),e);
 				}
 			} catch (Exception e) {
 				log.error("Error IN crawling "+(url!=null?url.toString():""), e);

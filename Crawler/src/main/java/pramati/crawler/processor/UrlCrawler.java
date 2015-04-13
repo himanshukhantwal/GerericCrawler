@@ -42,7 +42,7 @@ public class UrlCrawler {
 	}
 
 	private void crawling(URL url) throws Exception{
-		urlToBeCrawled=new ArrayBlockingQueue<URL>(noOfThreads*10000);
+		urlToBeCrawled=new ArrayBlockingQueue<URL>(noOfThreads*1000000);
 		Collections.synchronizedSet(crawledUrl);
 		urlToBeCrawled.add(url);
 		for(int i=0;i<noOfThreads*2;i++){

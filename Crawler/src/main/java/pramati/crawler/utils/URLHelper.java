@@ -32,16 +32,17 @@ public class URLHelper {
 	}
 
 	private String getPageContent(URL url) throws Exception {
-		BufferedInputStream reader=null;
+		BufferedInputStream reader = null;
+		Writer writer = null;
 		try {
-			reader=new BufferedInputStream(url.openStream());
+			reader = new BufferedInputStream(url.openStream());
+			writer = new StringWriter();
+			for (int c = reader.read(); c != -1; c = reader.read()) {
+				writer.write(c);
+			}
 		} catch (IOException e) {
-			log.error("PROBLEM_IN_URL_READING"+url.toString());
-		}
-		
-		Writer writer=new StringWriter();
-		for(int c=reader.read();c!=-1;c=reader.read()){
-			writer.write(c);
+			log.error("PROBLEM_IN_URL_READING " + url.toString());
+			throw e;
 		}
 		return writer.toString();
 	}

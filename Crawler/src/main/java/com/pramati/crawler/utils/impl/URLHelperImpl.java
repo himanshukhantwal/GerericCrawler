@@ -1,4 +1,4 @@
-package pramati.crawler.utils;
+package com.pramati.crawler.utils.impl;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -8,6 +8,8 @@ import java.net.URL;
 
 import org.apache.log4j.Logger;
 
+import com.pramati.crawler.utils.URLHelper;
+
 /**
  * singleton class
  * 
@@ -15,17 +17,8 @@ import org.apache.log4j.Logger;
  * @author himanshuk
  *
  */
-public class URLHelper {
-	private final Logger log=Logger.getLogger(URLHelper.class);
-	private static URLHelper instance; 
-	private URLHelper(){}
-	
-	public static URLHelper getInstance() {
-		if(instance!=null)
-			return instance;
-		else
-			return instance=new URLHelper();
-	}
+public class URLHelperImpl implements URLHelper{
+	private final Logger log=Logger.getLogger(URLHelperImpl.class);
 
 	public String getPageContentInTxtFrmt(URL url) throws Exception {
 		return getPageContent(url);

@@ -1,4 +1,4 @@
-package pramati.crawler.processor;
+package com.pramati.crawler.workers;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -6,15 +6,20 @@ import java.util.concurrent.BlockingQueue;
 
 import org.apache.log4j.Logger;
 
-import pramati.crawler.interfaces.DownloaderHelper;
-import pramati.crawler.utils.URLHelper;
-import pramati.crawler.utils.WCFileHandler;
+import com.pramati.crawler.helpers.DownloaderHelper;
+import com.pramati.crawler.utils.FileHandler;
+import com.pramati.crawler.utils.URLHelper;
 
 public class DownloadWorker implements Runnable{
 	private static final Logger log=Logger.getLogger(DownloadWorker.class);
+	private static String downloadDir;
+
+	private static URLHelper urlHelper;
+	private static FileHandler fileHandler;
+	
 	private BlockingQueue<URL> sharedQueue;
 	private DownloaderHelper fileDownloadHelperForMail;
-	private String downloadDir;
+
 	private static URL POISON;
 
 	static{
@@ -32,7 +37,7 @@ public class DownloadWorker implements Runnable{
 			DownloaderHelper fileDownloadHelperForMail, String downloadDir) {
 		this.sharedQueue=sharedQueue;
 		this.fileDownloadHelperForMail=fileDownloadHelperForMail;
-		this.downloadDir=downloadDir;
+		DownloadWorker.downloadDir=downloadDir;
 	}
 
 	public void run() {
@@ -59,17 +64,41 @@ public class DownloadWorker implements Runnable{
 	}
 	
 	private void createRecoveryForUrl(URL url) throws Exception{
-		WCFileHandler.getInstance().createDir(downloadDir+"/Recovery");
-		WCFileHandler.getInstance().createFile(url.toString(),downloadDir+"/Recovery");	
+		fileHandler.createDir(downloadDir+"/Recovery");
+		fileHandler.createFile(url.toString(),downloadDir+"/Recovery");	
 	}
 
 	private void downloadUrlContent(URL url) throws Exception {
-		String fileContnt=URLHelper.getInstance().getPageContentInTxtFrmt(url);
+		String fileContnt=urlHelper.getPageContentInTxtFrmt(url);
 		String dirName=fileDownloadHelperForMail.getDirOfFileFrmUrlCntnt(fileContnt);
 		String fileName=fileDownloadHelperForMail.getFileNameFrmUrlCntnt(fileContnt);
-		WCFileHandler.getInstance().createDir(dirName);
-		WCFileHandler.getInstance().createFileAndWriteTxt(fileName, dirName, fileContnt);
+		fileHandler.createDir(dirName);
+		fileHandler.createFileAndWriteTxt(fileName, dirName, fileContnt);
 		log.info("downloaded "+fileName);
+	}
+	
+	public static URLHelper getUrlHelper() {
+		return urlHelper;
+	}
+
+	public static void setUrlHelper(URLHelper urlHelper) {
+		DownloadWorker.urlHelper = urlHelper;
+	}
+	
+	public static FileHandler getFileHandler() {
+		return fileHandler;
+	}
+
+	public static void setFileHandler(FileHandler fileHandler) {
+		DownloadWorker.fileHandler = fileHandler;
+	}
+	
+	public static String getDownloadDir() {
+		return downloadDir;
+	}
+
+	public static void setDownloadDir(String downloadDir) {
+		DownloadWorker.downloadDir = downloadDir;
 	}
 
 }

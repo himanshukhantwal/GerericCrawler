@@ -1,27 +1,22 @@
-package pramati.crawler.utils;
+package com.pramati.crawler.utils.impl;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class WCFileHandler {
-	//private static final Logger log=Logger.getLogger(WCFileHandler.class);
-	private static WCFileHandler instance=null;
-	private WCFileHandler(){}
-	
-	public static WCFileHandler getInstance() {
-		if(instance!=null){
-			return instance;
-		}else
-			return instance=new WCFileHandler();
-	}
+import org.apache.log4j.Logger;
+
+import com.pramati.crawler.utils.FileHandler;
+
+public class FileHandlerImpl implements FileHandler{
+	private static final Logger log=Logger.getLogger(FileHandlerImpl.class);
 
 	public void createDir(String dirPath) throws Exception {
 		File file=new File(dirPath);
 		if(!file.exists()){
 		if(file.mkdirs()){
-			//log.debug("Directory "+dirPath+" created successfully!!!");
+			log.debug("Directory "+dirPath+" created successfully!!!");
 		}else{
 			//log.error("FAILED_TO_CREATE_DIRECTORY: please check if you have proper permissions");
 			}
@@ -37,16 +32,14 @@ public class WCFileHandler {
 		file.createNewFile();
 		bw=new BufferedWriter(new FileWriter(file));
 		bw.write(textTosave);
-		//log.info("--File {"+fileName+"} is downloaded successfully--");
 		}catch(IOException e){
-			e.printStackTrace();
-			//log.error("error occured while writing: file {"+fileName+"} in dir {"+dirPath+"}",e);
+			log.error("error occured while writing: file {"+fileName+"} in dir {"+dirPath+"}",e);
 		}finally{
 			try {
 				bw.flush();
 				bw.close();
 			} catch (IOException e) {
-				//log.error("error occured while flush: file {"+fileName+"} in dir {"+dirPath+"}",e);
+				log.error("error occured while flush: file {"+fileName+"} in dir {"+dirPath+"}",e);
 			}
 		}
 	}
@@ -57,7 +50,7 @@ public class WCFileHandler {
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("IOException", e);
 		}
 		
 	}

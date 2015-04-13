@@ -1,4 +1,4 @@
-package pramati.crawler.interfaces;
+package com.pramati.crawler.helpers;
 
 public interface DownloaderHelper {
 	String getFileNameFrmUrlCntnt(String fileCntnt);

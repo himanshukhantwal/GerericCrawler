@@ -1,4 +1,4 @@
-package pramati.crawler.processor;
+package com.pramati.crawler.workers;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -11,15 +11,17 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
-import pramati.crawler.interfaces.UrlFilter;
-import pramati.crawler.utils.HyperLinkExtractor;
+import com.pramati.crawler.helpers.UrlFilter;
+import com.pramati.crawler.utils.HyperLinkExtractor;
 
 public class CrawlingWorker implements Runnable {
 	private static final Logger log =Logger.getLogger(CrawlingWorker.class);
-	private Set<URL> crawledUrl = new LinkedHashSet<URL>();
+	private static HyperLinkExtractor hyperLinkExtractor;
+	private Set<URL> crawledUrl;
 	private UrlFilter urlFilter;
 	private BlockingQueue<URL> sharedQueue;
 	private BlockingQueue<URL> urlToBeCrawled;
+
 	private static final URL POISON;
 	
 	static{
@@ -60,8 +62,7 @@ public class CrawlingWorker implements Runnable {
 					continue;
 				}
 				try{
-				List<String> hyperlynk = HyperLinkExtractor.getInstance()
-						.getAllHyperlinks(url);
+				List<String> hyperlynk = hyperLinkExtractor.getAllHyperlinks(url);
 				List<URL> hyperlynkUrl = getUrlsFrmHyprlynk(url, hyperlynk);
 				Set<URL> filteredUrl = urlFilter.filter(hyperlynkUrl);
 				urlToBeCrawled.addAll(filteredUrl);
@@ -75,7 +76,7 @@ public class CrawlingWorker implements Runnable {
 			try {
 				sharedQueue.put(POISON);
 			} catch (InterruptedException e) {
-				log.error("InterruptedException", e);
+				log.error("Interrupted Exception", e);
 			}
 	}
 
@@ -86,10 +87,18 @@ public class CrawlingWorker implements Runnable {
 				URL hyprlynkURL = new URL(url, snglHyprlynk);
 				hyperlynkUrlList.add(hyprlynkURL);
 			} catch (MalformedURLException e) {
-				e.printStackTrace();
+				log.error("HYPERLINK_NOT_PROPER", e);
 			}
 		}
 		return hyperlynkUrlList;
+	}
+	
+	public static HyperLinkExtractor getHyperLinkExtractor() {
+		return CrawlingWorker.hyperLinkExtractor;
+	}
+
+	public static void setHyperLinkExtractor(HyperLinkExtractor hyperLinkExtractor) {
+		CrawlingWorker.hyperLinkExtractor = hyperLinkExtractor;
 	}
 
 }

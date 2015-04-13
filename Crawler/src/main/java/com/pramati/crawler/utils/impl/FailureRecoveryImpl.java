@@ -1,4 +1,4 @@
-package pramati.crawler.utils;
+package com.pramati.crawler.utils.impl;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -8,22 +8,16 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import pramati.crawler.interfaces.UrlFilter;
+import com.pramati.crawler.helpers.UrlFilter;
+import com.pramati.crawler.utils.FailureRecovery;
+import com.pramati.crawler.utils.FileHandler;
 
-public class FailureRecovery {
-	private static FailureRecovery instance;
-	private FailureRecovery(){}
-		
-	public static FailureRecovery getInstance(){
-		if(instance!=null)
-			return instance;
-		else
-			return instance=new FailureRecovery();
-	}
+public class FailureRecoveryImpl implements FailureRecovery{
 
+	private FileHandler fileHandler;
 
 	public Set<URL> getDwnlodedUrls(String recoveryDir,UrlFilter urlFilter) {
-		File[] fileList=WCFileHandler.getInstance().getFileListFrmDir(recoveryDir);
+		File[] fileList=fileHandler.getFileListFrmDir(recoveryDir);
 		Set<URL> urlSet=new LinkedHashSet<URL>();
 		for(File file:fileList){
 			if(file.isFile()){
@@ -37,5 +31,13 @@ public class FailureRecovery {
 		List<URL> temp=new ArrayList<URL>();
 		temp.addAll(urlSet);
 		return urlFilter.filter(temp);
+	}
+	
+	public FileHandler getFileHandler() {
+		return fileHandler;
+	}
+
+	public void setFileHandler(FileHandler fileHandler) {
+		this.fileHandler = fileHandler;
 	}
 }

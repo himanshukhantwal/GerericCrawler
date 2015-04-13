@@ -1,4 +1,4 @@
-package pramati.crawler;
+package com.pramati.crawler.main;
 
 import java.util.Scanner;
 
@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import pramati.crawler.interfaces.WebCrawlerImp;
+import com.pramati.crawler.WebCrawler;
 
 /**
  * Hello world!
@@ -18,8 +18,9 @@ public class WebCrawlerStartup
     public static void main( String[] args ) throws Exception
     {
     	String[] input=getUserInput();
-    	ApplicationContext context=new ClassPathXmlApplicationContext("spring.xml");
-    	WebCrawlerImp crawler=(WebCrawlerImp) context.getBean("webcrawlerimplementation");
+    	@SuppressWarnings("resource")
+		ApplicationContext context=new ClassPathXmlApplicationContext("spring.xml");
+    	WebCrawler crawler=(WebCrawler) context.getBean("webcrawlerimplementation");
     	log.info("\n\nURL to be crawler :"+input[0]+"\nYear to be Crawled :"+input[1]);
     	crawler.startCrawling(input); 	
     }

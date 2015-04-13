@@ -1,4 +1,4 @@
-package pramati.crawler.interfaces;
+package com.pramati.crawler.helpers;
 
 import java.net.URL;
 import java.util.List;

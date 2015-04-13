@@ -14,8 +14,30 @@
 
 <bean id="webcrawlerimplementation" class="${webCrawler.implementation.fullClasspath}">
 	<property name="downloadDir" value="${WebCrawler.downloads.baseDirectory}"/>
+	<property name="urlCrawler" ref="urlcrawler"/>
+	<property name="mailUrlFilter" ref="mailurlfilter"></property>
+	<property name="downloadHelper" ref="maildownloadhelper"></property>
 </bean>
-<bean id="urlcrawler" class="pramati.crawler.processor.UrlCrawler">
+
+<bean id="urlcrawler" class="com.pramati.crawler.workers.UrlCrawler">
+	<property name="downloadDir" value="${WebCrawler.downloads.baseDirectory}"/>
 	<property name="noOfThreads" value="${WebCrawler.threads.downloader.noOfThreads}"/>
+	<property name="failureRecovery" ref="failurerecovery"></property>
+	<property name="hyperLinkExtractor" ref="hyperlinkextractor"></property>
+	<property name="fileHandler" ref="filehandler"></property>
+	<property name="urlHelper" ref="urlhelper"></property>
 </bean>
+
+<bean id="mailurlfilter" class="com.pramati.crawler.helpers.impl.MailUrlFilterImpl"/>
+<bean id="maildownloadhelper" class="com.pramati.crawler.helpers.impl.MailDownloadHelperImpl"/>
+
+<bean id="failurerecovery" class="com.pramati.crawler.utils.impl.FailureRecoveryImpl">
+	<property name="fileHandler" ref="filehandler"></property>
+</bean>
+<bean id="hyperlinkextractor" class="com.pramati.crawler.utils.impl.HyperLinkExtractorImpl">
+	<property name="urlHelper" ref="urlhelper"></property>
+</bean>
+<bean id="urlhelper" class="com.pramati.crawler.utils.impl.URLHelperImpl"/>
+<bean id="filehandler" class="com.pramati.crawler.utils.impl.FileHandlerImpl"/>
+
 </beans>

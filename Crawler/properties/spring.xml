@@ -23,9 +23,17 @@
 	<property name="downloadDir" value="${WebCrawler.downloads.baseDirectory}"/>
 	<property name="noOfThreads" value="${WebCrawler.threads.downloader.noOfThreads}"/>
 	<property name="failureRecovery" ref="failurerecovery"></property>
+	<lookup-method name="createCrawlingWrkr" bean="crawlingworker"/>
+	<lookup-method name="createDwnldWrkr" bean="downloadworker"/>
+</bean>
+
+<bean id="crawlingworker" class="com.pramati.crawler.workers.CrawlingWorker" scope="prototype">
 	<property name="hyperLinkExtractor" ref="hyperlinkextractor"></property>
-	<property name="fileHandler" ref="filehandler"></property>
+</bean>
+<bean id="downloadworker" class="com.pramati.crawler.workers.DownloadWorker" scope="prototype">
+	<property name="downloadDir" value="${WebCrawler.downloads.baseDirectory}"></property>
 	<property name="urlHelper" ref="urlhelper"></property>
+	<property name="fileHandler" ref="filehandler"></property>
 </bean>
 
 <bean id="mailurlfilter" class="com.pramati.crawler.helpers.impl.MailUrlFilterImpl"/>

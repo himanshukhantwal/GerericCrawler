@@ -16,30 +16,27 @@ import com.pramati.crawler.utils.FileHandler;
 import com.pramati.crawler.utils.HyperLinkExtractor;
 import com.pramati.crawler.utils.URLHelper;
 
-public class UrlCrawler {
-	private static final Logger log=Logger.getLogger(UrlCrawler.class);
+public abstract class UrlCrawler {
+	private static final Logger log = Logger.getLogger(UrlCrawler.class);
 	private FailureRecovery failureRecovery;
-	private HyperLinkExtractor hyperLinkExtractor;
-	private FileHandler fileHandler;
-	private URLHelper urlHelper;
+
 	private String downloadDir;
 	private int noOfThreads;
-	
+
 	private UrlFilter urlFilter;
 	private DownloaderHelper fileDownloadHelperForMail;
-	
+
 	private Set<URL> crawledUrl;
 	private BlockingQueue<URL> sharedQueue;
 	private BlockingQueue<URL> urlToBeCrawled;
 
-
 	public void startUrlCrawling(URL url, UrlFilter urlFilter,
 			DownloaderHelper fileDownloadHelperForMail) throws Exception {
-		sharedQueue= new ArrayBlockingQueue<URL>(noOfThreads*100);
-		crawledUrl=new LinkedHashSet<URL>();
-		this.urlFilter=urlFilter;
-		this.fileDownloadHelperForMail=fileDownloadHelperForMail;
-		
+		sharedQueue = new ArrayBlockingQueue<URL>(noOfThreads * 100);
+		crawledUrl = new LinkedHashSet<URL>();
+		this.urlFilter = urlFilter;
+		this.fileDownloadHelperForMail = fileDownloadHelperForMail;
+
 		this.doRecoveryProcess();
 		createWorkerForDownld();
 		createWorkerForCrawling(url);
@@ -47,33 +44,35 @@ public class UrlCrawler {
 
 	private void doRecoveryProcess() {
 		log.info("Recovery From Previous Failures");
-		crawledUrl.addAll(failureRecovery.getDwnlodedUrls(downloadDir+"/Recovery",urlFilter));
-		log.info("Total "+crawledUrl.size()+" Already Downloaded!!!\n");
+		crawledUrl.addAll(failureRecovery.getDwnlodedUrls(downloadDir
+				+ "/Recovery", urlFilter));
+		log.info("Total " + crawledUrl.size() + " Already Downloaded!!!\n");
 	}
 
-	private void createWorkerForCrawling(URL url) throws Exception{
-		urlToBeCrawled=new ArrayBlockingQueue<URL>(noOfThreads*1000000);
+	private void createWorkerForCrawling(URL url) throws Exception {
+		urlToBeCrawled = new ArrayBlockingQueue<URL>(noOfThreads * 1000000);
 		Collections.synchronizedSet(crawledUrl);
 		urlToBeCrawled.add(url);
-		
-		CrawlingWorker.setHyperLinkExtractor(hyperLinkExtractor);
-		for(int i=0;i<noOfThreads*2;i++){
-			Thread crawlingWorker = new Thread(new CrawlingWorker(urlFilter,
-					sharedQueue, urlToBeCrawled, crawledUrl));
-			crawlingWorker.start();
+
+		for (int i = 0; i < noOfThreads * 2; i++) {
+			CrawlingWorker crawlingWorker = createCrawlingWrkr();
+			crawlingWorker.init(urlFilter, sharedQueue, urlToBeCrawled,
+					crawledUrl);
+			Thread crwlngWrkrThread = new Thread(crawlingWorker);
+			crwlngWrkrThread.start();
 		}
 	}
+
 	private void createWorkerForDownld() {
-		DownloadWorker.setFileHandler(fileHandler);
-		DownloadWorker.setUrlHelper(urlHelper);
-		DownloadWorker.setDownloadDir(downloadDir);
-		
-		for(int i=0;i<noOfThreads;i++){
-		Thread downloadWorker=new Thread(new DownloadWorker(sharedQueue, fileDownloadHelperForMail, downloadDir));
-		downloadWorker.start();
-		}		
+
+		for (int i = 0; i < noOfThreads; i++) {
+			DownloadWorker downloadWorker=createDwnldWrkr();
+			downloadWorker.init(sharedQueue,fileDownloadHelperForMail);
+			Thread dwnldWrkrThread = new Thread(downloadWorker);
+			dwnldWrkrThread.start();
+		}
 	}
-	
+
 	public int getNoOfThreads() {
 		return noOfThreads;
 	}
@@ -81,7 +80,7 @@ public class UrlCrawler {
 	public void setNoOfThreads(int noOfThreads) {
 		this.noOfThreads = noOfThreads;
 	}
-	
+
 	public FailureRecovery getFailureRecovery() {
 		return failureRecovery;
 	}
@@ -89,7 +88,7 @@ public class UrlCrawler {
 	public void setFailureRecovery(FailureRecovery failureRecovery) {
 		this.failureRecovery = failureRecovery;
 	}
-	
+
 	public String getDownloadDir() {
 		return downloadDir;
 	}
@@ -98,27 +97,7 @@ public class UrlCrawler {
 		this.downloadDir = downloadDir;
 	}
 
-	public HyperLinkExtractor getHyperLinkExtractor() {
-		return hyperLinkExtractor;
-	}
+	protected abstract CrawlingWorker createCrawlingWrkr();
 
-	public void setHyperLinkExtractor(HyperLinkExtractor hyperLinkExtractor) {
-		this.hyperLinkExtractor = hyperLinkExtractor;
-	}
-
-	public FileHandler getFileHandler() {
-		return fileHandler;
-	}
-
-	public void setFileHandler(FileHandler fileHandler) {
-		this.fileHandler = fileHandler;
-	}
-
-	public URLHelper getUrlHelper() {
-		return urlHelper;
-	}
-
-	public void setUrlHelper(URLHelper urlHelper) {
-		this.urlHelper = urlHelper;
-	}
+	protected abstract DownloadWorker createDwnldWrkr();
 }

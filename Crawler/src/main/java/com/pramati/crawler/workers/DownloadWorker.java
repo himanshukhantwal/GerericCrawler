@@ -12,10 +12,9 @@ import com.pramati.crawler.utils.URLHelper;
 
 public class DownloadWorker implements Runnable{
 	private static final Logger log=Logger.getLogger(DownloadWorker.class);
-	private static String downloadDir;
-
-	private static URLHelper urlHelper;
-	private static FileHandler fileHandler;
+	private String downloadDir;
+	private URLHelper urlHelper;
+	private FileHandler fileHandler;
 	
 	private BlockingQueue<URL> sharedQueue;
 	private DownloaderHelper fileDownloadHelperForMail;
@@ -33,11 +32,10 @@ public class DownloadWorker implements Runnable{
 		POISON=temp;
 	}
 	
-	public DownloadWorker(BlockingQueue<URL> sharedQueue,
-			DownloaderHelper fileDownloadHelperForMail, String downloadDir) {
+	public void init(BlockingQueue<URL> sharedQueue,
+			DownloaderHelper fileDownloadHelperForMail) {
 		this.sharedQueue=sharedQueue;
 		this.fileDownloadHelperForMail=fileDownloadHelperForMail;
-		DownloadWorker.downloadDir=downloadDir;
 	}
 
 	public void run() {
@@ -74,31 +72,31 @@ public class DownloadWorker implements Runnable{
 		String fileName=fileDownloadHelperForMail.getFileNameFrmUrlCntnt(fileContnt);
 		fileHandler.createDir(dirName);
 		fileHandler.createFileAndWriteTxt(fileName, dirName, fileContnt);
-		log.info("downloaded "+fileName);
+		log.info("downloaded {"+fileName+"} successfully");
 	}
 	
-	public static URLHelper getUrlHelper() {
+	public URLHelper getUrlHelper() {
 		return urlHelper;
 	}
 
-	public static void setUrlHelper(URLHelper urlHelper) {
-		DownloadWorker.urlHelper = urlHelper;
+	public void setUrlHelper(URLHelper urlHelper) {
+		this.urlHelper = urlHelper;
 	}
 	
-	public static FileHandler getFileHandler() {
+	public FileHandler getFileHandler() {
 		return fileHandler;
 	}
 
-	public static void setFileHandler(FileHandler fileHandler) {
-		DownloadWorker.fileHandler = fileHandler;
+	public void setFileHandler(FileHandler fileHandler) {
+		this.fileHandler = fileHandler;
 	}
 	
-	public static String getDownloadDir() {
+	public String getDownloadDir() {
 		return downloadDir;
 	}
 
-	public static void setDownloadDir(String downloadDir) {
-		DownloadWorker.downloadDir = downloadDir;
+	public void setDownloadDir(String downloadDir) {
+		this.downloadDir = downloadDir;
 	}
 
 }

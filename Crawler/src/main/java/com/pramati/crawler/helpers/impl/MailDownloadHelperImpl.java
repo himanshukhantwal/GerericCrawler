@@ -16,7 +16,7 @@ public class MailDownloadHelperImpl implements DownloaderHelper{
 				subjectStr=subjectStr.substring(0, 50);
 			}
 			String frmStr=getStrPartBasedOnstr(fileCntnt, "From: ");
-			String dateStr=getStrPartBasedOnstr(fileCntnt,"apmail-maven-users-archive=maven.apache.org@maven.apache.org ");
+			String dateStr=getStrPartBasedOnstr(fileCntnt,"Date: ");
 			
 			fileName=frmStr+" + "+subjectStr+" + "+dateStr;
 			return fileName;
@@ -24,18 +24,31 @@ public class MailDownloadHelperImpl implements DownloaderHelper{
 	
 	public String getDirOfFileFrmUrlCntnt(String fileCntnt) {
 		String dir = "";
-		String dateStr = getStrPartBasedOnstr(fileCntnt, "apmail-maven-users-archive=maven.apache.org@maven.apache.org ");
+		String dateStr = getStrPartBasedOnstr(fileCntnt, "Date: ");
 		String[] token = dateStr.split(" ");
 		int replaceInd = 0;
 		for (int i = 0; i < token.length; i++) {
 			if (!token[i].equals(""))
 				token[replaceInd++] = token[i];
 		}
-				if (token[4].length() == 4) {
-					token[4] = (token[4].trim()).substring(2);
+
+		if (dateStr.contains(",")) {
+			if (token.length > 3) {
+				if (token[3].length() == 4) {
+					token[3] = (token[3].trim()).substring(2);
 				}
-				dir = downloadDir + "/YEAR_" + token[4] + "/" + "MONTH_"
+				dir = downloadDir + "/YEAR_" + token[3] + "/" + "MONTH_"
+						+ token[2].trim();
+			}
+		} else {
+			if (token.length > 3) {
+				if (token[2].length() == 4) {
+					token[2] = (token[2].trim()).substring(2);
+				}
+				dir = downloadDir + "/YEAR_" + token[2] + "/" + "MONTH_"
 						+ token[1].trim();
+			}
+		}
 		return dir;
 	}
 

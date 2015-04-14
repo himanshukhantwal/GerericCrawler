@@ -16,7 +16,7 @@ import com.pramati.crawler.utils.HyperLinkExtractor;
 
 public class CrawlingWorker implements Runnable {
 	private static final Logger log =Logger.getLogger(CrawlingWorker.class);
-	private static HyperLinkExtractor hyperLinkExtractor;
+	private HyperLinkExtractor hyperLinkExtractor;
 	private Set<URL> crawledUrl;
 	private UrlFilter urlFilter;
 	private BlockingQueue<URL> sharedQueue;
@@ -35,7 +35,7 @@ public class CrawlingWorker implements Runnable {
 		POISON=temp;
 	}
 
-	public CrawlingWorker(UrlFilter urlFilter, BlockingQueue<URL> sharedQueue,
+	public void init(UrlFilter urlFilter, BlockingQueue<URL> sharedQueue,
 			BlockingQueue<URL> urlToBeCrawled, Set<URL> crawledUrl) {
 		this.urlFilter = urlFilter;
 		this.sharedQueue = sharedQueue;
@@ -93,12 +93,12 @@ public class CrawlingWorker implements Runnable {
 		return hyperlynkUrlList;
 	}
 	
-	public static HyperLinkExtractor getHyperLinkExtractor() {
-		return CrawlingWorker.hyperLinkExtractor;
+	public HyperLinkExtractor getHyperLinkExtractor() {
+		return this.hyperLinkExtractor;
 	}
 
-	public static void setHyperLinkExtractor(HyperLinkExtractor hyperLinkExtractor) {
-		CrawlingWorker.hyperLinkExtractor = hyperLinkExtractor;
+	public void setHyperLinkExtractor(HyperLinkExtractor hyperLinkExtractor) {
+		this.hyperLinkExtractor = hyperLinkExtractor;
 	}
 
 }

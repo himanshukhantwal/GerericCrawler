@@ -8,15 +8,18 @@ import com.pramati.crawler.helpers.DownloaderHelper;
 public class MailDownloadHelperImpl implements DownloaderHelper{
 	
 	private String downloadDir;
+	private String subjectRegex;
+	private String fromRegex;
+	private String dateRegex;
 
 	public String getFileNameFrmUrlCntnt(String fileCntnt) {
 			String fileName=null;
-			String subjectStr=getStrPartBasedOnstr(fileCntnt, "Subject: ");
+			String subjectStr=getStrPartBasedOnRegex(fileCntnt, subjectRegex);
 			if(subjectStr.length()>50){
 				subjectStr=subjectStr.substring(0, 50);
 			}
-			String frmStr=getStrPartBasedOnstr(fileCntnt, "From: ");
-			String dateStr=getStrPartBasedOnstr(fileCntnt,"Date: ");
+			String frmStr=getStrPartBasedOnRegex(fileCntnt, fromRegex);
+			String dateStr=getStrPartBasedOnRegex(fileCntnt,dateRegex);
 			
 			fileName=frmStr+" + "+subjectStr+" + "+dateStr;
 			return fileName;
@@ -24,7 +27,7 @@ public class MailDownloadHelperImpl implements DownloaderHelper{
 	
 	public String getDirOfFileFrmUrlCntnt(String fileCntnt) {
 		String dir = "";
-		String dateStr = getStrPartBasedOnstr(fileCntnt, "Date: ");
+		String dateStr = getStrPartBasedOnRegex(fileCntnt, dateRegex);
 		String[] token = dateStr.split(" ");
 		int replaceInd = 0;
 		for (int i = 0; i < token.length; i++) {
@@ -52,9 +55,9 @@ public class MailDownloadHelperImpl implements DownloaderHelper{
 		return dir;
 	}
 
-	private String getStrPartBasedOnstr(String fileCntnt, String matchStr) {
+	private String getStrPartBasedOnRegex(String fileCntnt, String regex) {
 		String returnStr="";
-		Pattern pattern=Pattern.compile("\\s*"+matchStr+"\\s*(.*?)(?m)$");
+		Pattern pattern=Pattern.compile(regex);
 		Matcher matcher=pattern.matcher(fileCntnt);
 		if(matcher.find()){
 			returnStr=matcher.group(1);
@@ -69,4 +72,30 @@ public class MailDownloadHelperImpl implements DownloaderHelper{
 	public void setDownloadDir(String downloadDir) {
 		this.downloadDir = downloadDir;
 	}
+	
+	public String getSubjectRegex() {
+		return subjectRegex;
+	}
+
+	public void setSubjectRegex(String subjectRegex) {
+		this.subjectRegex = subjectRegex;
+	}
+
+	public String getFromRegex() {
+		return fromRegex;
+	}
+
+	public void setFromRegex(String fromRegex) {
+		this.fromRegex = fromRegex;
+	}
+
+	public String getDateRegex() {
+		return dateRegex;
+	}
+
+	public void setDateRegex(String dateRegex) {
+		this.dateRegex = dateRegex;
+	}
+
+
 }

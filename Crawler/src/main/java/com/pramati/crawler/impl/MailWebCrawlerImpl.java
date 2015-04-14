@@ -23,8 +23,8 @@ public class MailWebCrawlerImpl implements WebCrawler{
 	private UrlCrawler urlCrawler;
 	private UrlFilter mailUrlFilter;
 	private DownloaderHelper downloadHelper;
-	private static String year="";
-	private static String downloadDir;
+	private String year="";
+	private String downloadDir;
 
 	public void startCrawling(String[] input) throws Exception {
 		log.info("starting crawler....");
@@ -52,9 +52,6 @@ public class MailWebCrawlerImpl implements WebCrawler{
 		if(mailUrlFilter instanceof MailUrlFilterImpl){
 			((MailUrlFilterImpl) mailUrlFilter).setYear(year);			
 		}
-		if(downloadHelper instanceof MailDownloadHelperImpl){
-			((MailDownloadHelperImpl) downloadHelper).setDownloadDir(downloadDir);
-		}
 	}
 	
 	public UrlCrawler getUrlCrawler() {
@@ -81,12 +78,12 @@ public class MailWebCrawlerImpl implements WebCrawler{
 		this.downloadHelper = downloadHelper;
 	}
 
-	public static String getDownloadDir() {
+	public String getDownloadDir() {
 		return downloadDir;
 	}
 
-	public static void setDownloadDir(String downloadDir) {
-		MailWebCrawlerImpl.downloadDir = downloadDir;
+	public void setDownloadDir(String downloadDir) {
+		this.downloadDir = downloadDir;
 	}
 }
 

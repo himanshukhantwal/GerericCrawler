@@ -12,16 +12,15 @@ import com.pramati.crawler.helpers.UrlFilter;
 public class MailUrlFilterImpl implements UrlFilter{
 	
 	private String year;
+	private String urlFilterRegex;
+	private String endConditionRegex;
 
 	public Set<URL> filter(List<URL> urlList) {
 		Set<URL> filteredUrlSet=new HashSet<URL>();
 		for(URL url:urlList){
-			Pattern pattern=Pattern.compile(year+"([0-9])([0-9]?)"+".mbox");
+			Pattern pattern=Pattern.compile(year+urlFilterRegex);
 			Matcher matcher=pattern.matcher(url.toString());
-			if (matcher.find()
-					&& !((url.toString()).contains(".mbox/date"))
-					&& !((url.toString()).contains(".mbox/author"))
-					&& !((url.toString()).contains(".mbox/browser"))) {
+			if (matcher.find()) {
 				filteredUrlSet.add(url);
 			}
 		}
@@ -31,7 +30,7 @@ public class MailUrlFilterImpl implements UrlFilter{
 
 	public boolean isfinal(URL url) throws Exception {
 		if(url.toString().contains("raw") && !url.toString().contains("${")){
-			Pattern pattern=Pattern.compile("raw/%3c"+"(.*?)"+"%3e"+"(?m)$");
+			Pattern pattern=Pattern.compile(endConditionRegex);
 			Matcher matcher=pattern.matcher(url.toString());
 			if(matcher.find()){
 				return true;
@@ -47,4 +46,21 @@ public class MailUrlFilterImpl implements UrlFilter{
 	public void setYear(String year) {
 		this.year = year;
 	}
+	
+	public String getUrlFilterRegex() {
+		return urlFilterRegex;
+	}
+
+	public void setUrlFilterRegex(String urlFilterRegex) {
+		this.urlFilterRegex = urlFilterRegex;
+	}
+
+	public String getEndConditionRegex() {
+		return endConditionRegex;
+	}
+
+	public void setEndConditionRegex(String endConditionRegex) {
+		this.endConditionRegex = endConditionRegex;
+	}
+
 }

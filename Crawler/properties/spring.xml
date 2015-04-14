@@ -27,6 +27,7 @@
 	<lookup-method name="createDwnldWrkr" bean="downloadworker"/>
 </bean>
 
+<!-- *************worker beans************************ -->
 <bean id="crawlingworker" class="com.pramati.crawler.workers.CrawlingWorker" scope="prototype">
 	<property name="hyperLinkExtractor" ref="hyperlinkextractor"></property>
 </bean>
@@ -35,10 +36,22 @@
 	<property name="urlHelper" ref="urlhelper"></property>
 	<property name="fileHandler" ref="filehandler"></property>
 </bean>
+<!-- ********************************************************** -->
 
-<bean id="mailurlfilter" class="com.pramati.crawler.helpers.impl.MailUrlFilterImpl"/>
-<bean id="maildownloadhelper" class="com.pramati.crawler.helpers.impl.MailDownloadHelperImpl"/>
+<!-- *************helper beans************************ -->
+<bean id="mailurlfilter" class="com.pramati.crawler.helpers.impl.MailUrlFilterImpl">
+	<property name="urlFilterRegex" value="${WebCrawler.regex.urlFilters.basicFilter}"></property>
+	<property name="endConditionRegex" value="${WebCrawler.regex.urlFilters.endConditionFilter}"></property>
+</bean>
+<bean id="maildownloadhelper" class="com.pramati.crawler.helpers.impl.MailDownloadHelperImpl">
+	<property name="downloadDir" value="${WebCrawler.downloads.baseDirectory}"></property>
+	<property name="subjectRegex" value="${WebCrawler.regex.fileContent.subject}"></property>
+	<property name="fromRegex" value="${WebCrawler.regex.fileContent.from}"></property>
+	<property name="dateRegex" value="${WebCrawler.regex.fileContent.date}"></property>
+</bean>
+<!-- ********************************************************** -->
 
+<!-- *************utility beans************************ -->
 <bean id="failurerecovery" class="com.pramati.crawler.utils.impl.FailureRecoveryImpl">
 	<property name="fileHandler" ref="filehandler"></property>
 </bean>
@@ -47,5 +60,6 @@
 </bean>
 <bean id="urlhelper" class="com.pramati.crawler.utils.impl.URLHelperImpl"/>
 <bean id="filehandler" class="com.pramati.crawler.utils.impl.FileHandlerImpl"/>
+<!-- ********************************************************** -->
 
 </beans>

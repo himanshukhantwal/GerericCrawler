@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context 
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/mvc
+                           http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+<context:component-scan base-package="pramati.wc.crawler" />
+<context:property-placeholder location="classpath:WCBasics.properties"/>
+
+<bean id="webcrawlerimplementation" class="${webCrawler.implementation.fullClasspath}">
+	<property name="downloadDir" value="${WebCrawler.downloads.baseDirectory}"/>
+	<property name="urlCrawler" ref="urlcrawler"/>
+	<property name="mailUrlFilter" ref="mailurlfilter"></property>
+	<property name="downloadHelper" ref="maildownloadhelper"></property>
+</bean>
+
+<bean id="urlcrawler" class="com.pramati.crawler.workers.UrlCrawler">
+	<property name="downloadDir" value="${WebCrawler.downloads.baseDirectory}"/>
+	<property name="noOfThreads" value="${WebCrawler.threads.downloader.noOfThreads}"/>
+	<property name="failureRecovery" ref="failurerecovery"></property>
+	<lookup-method name="createCrawlingWrkr" bean="crawlingworker"/>
+	<lookup-method name="createDwnldWrkr" bean="downloadworker"/>
+</bean>
+
+<!-- *************worker beans************************ -->
+<bean id="crawlingworker" class="com.pramati.crawler.workers.CrawlingWorker" scope="prototype">
+	<property name="hyperLinkExtractor" ref="hyperlinkextractor"></property>
+</bean>
+<bean id="downloadworker" class="com.pramati.crawler.workers.DownloadWorker" scope="prototype">
+	<property name="downloadDir" value="${WebCrawler.downloads.baseDirectory}"></property>
+	<property name="urlHelper" ref="urlhelper"></property>
+	<property name="fileHandler" ref="filehandler"></property>
+</bean>
+<!-- ********************************************************** -->
+
+<!-- *************helper beans************************ -->
+<bean id="mailurlfilter" class="com.pramati.crawler.helpers.impl.MailUrlFilterImpl">
+	<property name="urlFilterRegex" value="${WebCrawler.regex.urlFilters.basicFilter}"></property>
+	<property name="endConditionRegex" value="${WebCrawler.regex.urlFilters.endConditionFilter}"></property>
+</bean>
+<bean id="maildownloadhelper" class="com.pramati.crawler.helpers.impl.MailDownloadHelperImpl">
+	<property name="downloadDir" value="${WebCrawler.downloads.baseDirectory}"></property>
+	<property name="subjectRegex" value="${WebCrawler.regex.fileContent.subject}"></property>
+	<property name="fromRegex" value="${WebCrawler.regex.fileContent.from}"></property>
+	<property name="dateRegex" value="${WebCrawler.regex.fileContent.date}"></property>
+</bean>
+<!-- ********************************************************** -->
+
+<!-- *************utility beans************************ -->
+<bean id="failurerecovery" class="com.pramati.crawler.utils.impl.FailureRecoveryImpl">
+	<property name="fileHandler" ref="filehandler"></property>
+</bean>
+<bean id="hyperlinkextractor" class="com.pramati.crawler.utils.impl.HyperLinkExtractorImpl">
+	<property name="urlHelper" ref="urlhelper"></property>
+</bean>
+<bean id="urlhelper" class="com.pramati.crawler.utils.impl.URLHelperImpl"/>
+<bean id="filehandler" class="com.pramati.crawler.utils.impl.FileHandlerImpl"/>
+<!-- ********************************************************** -->
+
+</beans>

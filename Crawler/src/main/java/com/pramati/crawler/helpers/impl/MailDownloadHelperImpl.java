@@ -52,7 +52,12 @@ public class MailDownloadHelperImpl implements DownloaderHelper{
 						+ token[1].trim();
 			}
 		}
-		return dir;
+
+		String subjectStr=getStrPartBasedOnRegex(fileCntnt, subjectRegex);
+		if(subjectStr.indexOf("Re: ")!=-1){
+			subjectStr=subjectStr.substring(subjectStr.lastIndexOf("Re: "),subjectStr.length());
+		}
+		return dir+'/'+subjectStr;
 	}
 
 	private String getStrPartBasedOnRegex(String fileCntnt, String regex) {
